@@ -12,7 +12,7 @@ func GetAntutuList(w http.ResponseWriter, r *http.Request) {
 	// return list of antutu
 
 	decoder := json.NewDecoder(r.Body)
-	var request model.Handphone
+	var request model.Smartphone
 	err := decoder.Decode(&request)
 	if err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
