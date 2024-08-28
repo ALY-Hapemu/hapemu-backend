@@ -25,7 +25,7 @@ func NewEmailService(port int, host, username, password string) *EmailService {
 	}
 }
 
-func (s *EmailService) SendEmail(to, subject, body string) (bool, error) {
+func (s *EmailService) sendEmail(to, subject, body string) (bool, error) {
 	auth := smtp.PlainAuth("", s.username, s.password, s.smtpHost)
 	from := s.username
 
@@ -66,7 +66,7 @@ func (s *EmailService) SendEmail(to, subject, body string) (bool, error) {
 // 	}
 // }
 
-func EmailRecommendations(w http.ResponseWriter, r *http.Request) {
+func (es *EmailService) EmailRecommendations(w http.ResponseWriter, r *http.Request) {
 	var emailRequest model.EmailRequest
 
 	decoder := json.NewDecoder(r.Body)
@@ -75,8 +75,6 @@ func EmailRecommendations(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	emailService := NewEmailService(587, "smtp.gmail.com", "hapemu.id@gmail.com", "fdvtmvobhemhxvvi")
 
 	var message = `<p>Here are top 5 recommendations for you based on the quiz. We hope you find them useful:</p>
     <ol>
@@ -89,7 +87,7 @@ func EmailRecommendations(w http.ResponseWriter, r *http.Request) {
 
 	var recommendations = emailRequest.Recommendations
 	formattedMessage := fmt.Sprintf(message, recommendations[0], recommendations[1], recommendations[2], recommendations[3], recommendations[4])
-	sent, err := emailService.SendEmail(emailRequest.UserEmail, "Email recommendations from hapemu", formattedMessage)
+	sent, err := es.sendEmail(emailRequest.UserEmail, "Email recommendations from hapemu", formattedMessage)
 
 	if err != nil {
 		log.Fatalf("Error when sending email: %s", err)
