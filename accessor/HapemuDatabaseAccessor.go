@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"hapemu/model"
+	"time"
 )
 
 type HapemuDatabaseAccessor struct {
@@ -35,7 +36,7 @@ func (hda *HapemuDatabaseAccessor) GetSmartphoneList() []model.Smartphone {
 	}
 	defer db.Close()
 
-	sqlStatement := `SELECT name, "segmentPrice", processor,"dxomarkScore", battery, ram, storage FROM smartphones`
+	sqlStatement := `SELECT name, "segmentPrice", processor,"dxomarkScore", battery, ram, storage, launchDate FROM smartphones`
 	rows, err := db.Query(sqlStatement)
 	if err != nil {
 		fmt.Println("failed on query " + err.Error())
@@ -52,8 +53,9 @@ func (hda *HapemuDatabaseAccessor) GetSmartphoneList() []model.Smartphone {
 		var battery sql.NullString
 		var ram sql.NullString
 		var storage sql.NullString
+		var launchDate sql.NullString
 
-		err := rows.Scan(&name, &segmentPrice, &processor, &dxomarkScore, &battery, &ram, &storage)
+		err := rows.Scan(&name, &segmentPrice, &processor, &dxomarkScore, &battery, &ram, &storage, &launchDate)
 		if err != nil {
 			fmt.Println("Error when scanning to Go struct:", err)
 			return smartphones
@@ -101,7 +103,19 @@ func (hda *HapemuDatabaseAccessor) GetSmartphoneList() []model.Smartphone {
 		} else {
 			smartphone.Storage = "" // Default value or handle appropriately
 		}
-		smartphones = append(smartphones, smartphone)
+
+		var layout = "2006-01-02"
+		parsedDate, err := time.Parse(layout, launchDate.String)
+		if err != nil {
+			fmt.Println("Error when parsing launch date:", err)
+		}
+
+		currentDate := time.Now()
+		threeYearsAgo := currentDate.AddDate(-3, 0, 0)
+		if launchDate.Valid && parsedDate.After(threeYearsAgo) {
+			fmt.Println(launchDate.String)
+			smartphones = append(smartphones, smartphone)
+		}
 	}
 
 	// for _, phone := range smartphones {

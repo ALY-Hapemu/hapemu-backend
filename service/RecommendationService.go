@@ -43,6 +43,9 @@ func (rs *RecommendationService) RecommendSmartphones(w http.ResponseWriter, r *
 
 	for _, smartphone := range smartphones {
 		var smartphonesVec = rs.vectorGeneratorService.ConvertSmartphoneToVec(smartphone, userPreferenceVector)
+		if smartphonesVec[0] == 0 {
+			continue
+		}
 		similarity := rs.cosineSimilarityService.CosineSimilarity(smartphonesVec, userPreferenceVector)
 		similarities = append(similarities, model.SmartphoneSimilarity{Name: smartphone.Name, Similarity: similarity})
 	}
