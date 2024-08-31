@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"hapemu/model"
+	"log"
 	"time"
 )
 
@@ -36,7 +37,7 @@ func (hda *HapemuDatabaseAccessor) GetSmartphoneList() []model.Smartphone {
 	}
 	defer db.Close()
 
-	sqlStatement := `SELECT name, "segmentPrice", processor,"dxomarkScore", battery, ram, storage, launchDate FROM smartphones`
+	sqlStatement := `SELECT name, "segmentPrice", processor,"dxomarkScore", battery, ram, storage, "launchDate" FROM smartphones`
 	rows, err := db.Query(sqlStatement)
 	if err != nil {
 		fmt.Println("failed on query " + err.Error())
@@ -104,16 +105,15 @@ func (hda *HapemuDatabaseAccessor) GetSmartphoneList() []model.Smartphone {
 			smartphone.Storage = "" // Default value or handle appropriately
 		}
 
-		var layout = "2006-01-02"
+		var layout = time.RFC3339
 		parsedDate, err := time.Parse(layout, launchDate.String)
 		if err != nil {
-			fmt.Println("Error when parsing launch date:", err)
+			log.Fatalf("Error when sending email: %s", err)
 		}
 
 		currentDate := time.Now()
 		threeYearsAgo := currentDate.AddDate(-3, 0, 0)
 		if launchDate.Valid && parsedDate.After(threeYearsAgo) {
-			fmt.Println(launchDate.String)
 			smartphones = append(smartphones, smartphone)
 		}
 	}
