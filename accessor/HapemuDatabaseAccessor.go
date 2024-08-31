@@ -108,7 +108,7 @@ func (hda *HapemuDatabaseAccessor) GetSmartphoneList() []model.Smartphone {
 		var layout = time.RFC3339
 		parsedDate, err := time.Parse(layout, launchDate.String)
 		if err != nil {
-			log.Fatalf("Error when sending email: %s", err)
+			log.Fatalf("Error when parsing date: %s", err)
 		}
 
 		currentDate := time.Now()
