@@ -26,6 +26,14 @@ func getValueForPrice(price string) float64 {
 	return 4
 }
 
+func getFinalValueForPrice(smartphonePriceVec, userPriceVec float64) float64 {
+	if smartphonePriceVec != userPriceVec {
+		return -1
+	} else {
+		return smartphonePriceVec
+	}
+}
+
 func getValueForProcessor(processor string) float64 {
 	sTierProcessors := []string{
 		"Snapdragon 8 Gen 3",
@@ -291,12 +299,16 @@ func getValueForStorage(storage string, storageVec float64) float64 {
 
 func (vgs *VectorGeneratorService) ConvertSmartphoneToVec(smartphone model.Smartphone, userPreferenceVector []float64) []float64 {
 	var smartphonesVecs []float64
-	smartphonesVecs = append(smartphonesVecs, getValueForPrice(smartphone.SegmentPrice))                       // price
-	smartphonesVecs = append(smartphonesVecs, getValueForProcessor(smartphone.Processor))                      // processor
-	smartphonesVecs = append(smartphonesVecs, getValueForCamera(smartphone.DxomarkScore))                      // camera
-	smartphonesVecs = append(smartphonesVecs, getValueForBattery(smartphone.Battery))                          // battery
-	smartphonesVecs = append(smartphonesVecs, getValueForRam(smartphone.Ram, userPreferenceVector[4]))         // ram
-	smartphonesVecs = append(smartphonesVecs, getValueForStorage(smartphone.Storage, userPreferenceVector[5])) // storage
+	smartphonesVecs = append(smartphonesVecs, getFinalValueForPrice(getValueForPrice(smartphone.SegmentPrice), userPreferenceVector[0])) // price
+	smartphonesVecs = append(smartphonesVecs, getValueForProcessor(smartphone.Processor))                                                // processor
+	smartphonesVecs = append(smartphonesVecs, getValueForCamera(smartphone.DxomarkScore))                                                // camera
+	smartphonesVecs = append(smartphonesVecs, getValueForBattery(smartphone.Battery))                                                    // battery
+	smartphonesVecs = append(smartphonesVecs, getValueForRam(smartphone.Ram, userPreferenceVector[4]))                                   // ram
+	smartphonesVecs = append(smartphonesVecs, getValueForStorage(smartphone.Storage, userPreferenceVector[5]))                           // storage
+	fmt.Println(smartphonesVecs)
+	if smartphonesVecs[0] == -1 {
+		return nil
+	}
 	return smartphonesVecs
 }
 
