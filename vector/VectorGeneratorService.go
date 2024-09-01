@@ -314,7 +314,7 @@ func (vgs *VectorGeneratorService) ConvertSmartphoneToVec(smartphone model.Smart
 
 // region convert user quiz to vector
 func getPriceValue(price string) float64 {
-	if strings.Contains(price, "essensial") {
+	if strings.Contains(price, "essential") {
 		return 1
 	} else if strings.Contains(price, "midrange") {
 		return 2
