@@ -86,7 +86,8 @@ func (es *EmailService) EmailRecommendations(w http.ResponseWriter, r *http.Requ
     </ol>`
 
 	var recommendations = emailRequest.Recommendations
-	formattedMessage := fmt.Sprintf(message, recommendations[0], recommendations[1], recommendations[2], recommendations[3], recommendations[4])
+	formattedMessage := fmt.Sprintf(message, recommendations[0].Name,
+		recommendations[1].Name, recommendations[2].Name, recommendations[3].Name, recommendations[4].Name)
 	sent, err := es.sendEmail(emailRequest.UserEmail, "Email recommendations from hapemu", formattedMessage)
 
 	if err != nil {
